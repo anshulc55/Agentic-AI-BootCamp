@@ -17,5 +17,6 @@ dependencies = [
     "pydantic>=2.11.4",
     "pypdf>=5.5.0",
     "requests>=2.32.3",
+    "sendgrid>=6.12.4",
     "tensorflow>=2.19.0",
 ]

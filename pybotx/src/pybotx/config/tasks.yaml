@@ -1,0 +1,12 @@
+develop_python_solution:
+  description: >
+    Design and implement a complete Python solution to the following problem: {assignment}
+    The solution must include a planning section, the Python code itself, and the execution output.
+  expected_output: >
+    A detailed text file containing:
+    1. A step-by-step plan explaining how the problem is being approached,
+    2. The full Python code,
+    3. The console output from running the code,
+    4. Any observations, edge cases handled, or suggestions for improvement.
+  agent: code_engineer
+  output_file: output/code_and_output.txt

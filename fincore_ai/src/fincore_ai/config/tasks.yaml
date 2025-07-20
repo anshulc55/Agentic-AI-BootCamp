@@ -1,0 +1,33 @@
+company_research_task:
+  description: >
+    Perform an in-depth investigation into {company} focusing on the following key areas:
+    1. Current business status and financial health
+    2. Historical performance and milestones
+    3. Major risks, challenges, and market opportunities
+    4. Recent developments, news coverage, and public sentiment
+    5. Future projections, industry positioning, and strategic direction
+
+    Organize all findings into clearly structured sections with concise explanations and relevant examples.
+  expected_output: >
+    A detailed research document that thoroughly covers the five areas listed above,
+    with specific facts, key figures, and real-world references. The content should be segmented
+    into well-labeled sections for easy review and further analysis.
+  agent: financial_research_expert
+
+company_analysis_task:
+  description: >
+    Review the research data on {company} and synthesize it into a comprehensive and insightful market report. 
+    Your deliverable should:
+    1. Start with a concise executive summary highlighting the key insights
+    2. Present all essential research findings in a logical structure
+    3. Analyze trends, patterns, and market signals relevant to {company}
+    4. Offer a future market outlook with strategic commentary
+    5. Be styled as a polished report, using professional formatting with clear headings and section breaks
+  expected_output: >
+    A refined, publication-ready report on {company}, presenting research-backed insights and thoughtful analysis. 
+    The report should include an executive summary, well-defined sections, and a conclusion that ties findings together.
+  agent: market_insight_analyst
+  context:
+    - company_research_task
+  output_file: >
+    output/company_analysis_{company}.pdf

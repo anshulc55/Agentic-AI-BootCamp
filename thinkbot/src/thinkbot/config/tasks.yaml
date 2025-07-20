@@ -1,0 +1,29 @@
+make_case:
+  description: >
+    As ArguBot, your task is to propose the motion: {motion}.
+    Present a compelling, well-structured argument supporting the motion.
+    Be clear, persuasive, and logical.
+  expected_output: >
+    A concise and powerful argument in favor of the motion.
+  agent: argubot
+  output_file: output/make_case.md
+
+break_case:
+  description: >
+    As ArguBot, your task is to oppose the motion: {motion}.
+    Deliver a convincing counter-argument that challenges the core idea.
+    Stay sharp, logical, and focused.
+  expected_output: >
+    A well-reasoned argument against the motion.
+  agent: argubot
+  output_file: output/break_case.md
+
+render_verdict:
+  description: >
+    As VerdictoBot, your task is to evaluate both sides of the motion: {motion}.
+    Analyze the arguments presented by ArguBot and declare the more persuasive one.
+    Focus on reasoning, clarity, and structure — then decide the winner. 
+  expected_output: >
+    A clear verdict stating which argument was more persuasive, along with a clear explanation of why.
+  agent: verdictobot
+  output_file: output/render_verdict.md

@@ -1,0 +1,23 @@
+[project]
+name = "fincore_ai"
+version = "0.1.0"
+description = "FinCore_AI using crewAI"
+authors = [{ name = "Your Name", email = "you@example.com" }]
+requires-python = ">=3.10,<3.14"
+dependencies = [
+    "crewai[tools]>=0.141.0,<1.0.0"
+]
+
+[project.scripts]
+fincore_ai = "fincore_ai.main:run"
+run_crew = "fincore_ai.main:run"
+train = "fincore_ai.main:train"
+replay = "fincore_ai.main:replay"
+test = "fincore_ai.main:test"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.crewai]
+type = "crew"

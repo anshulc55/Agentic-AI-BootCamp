@@ -1,0 +1,31 @@
+identify_market_movers:
+  description: >
+    Search recent financial news to identify 1-2 companies currently trending in the {sector}.
+    Focus on identifying new companies not previously analyzed.
+    Avoid repetition across runs by checking the historical list or using a memory mechanism.
+  expected_output: >
+    A list of 1-2 new, trending companies in the {sector}, including name and brief reason for trending.
+  agent: market_trend_tracker
+
+analyze_company_fundamentals:
+  description: >
+    For each company in the trending list, provide a comprehensive research report.
+    Include financial metrics, growth drivers, risks, recent developments, and a brief investment outlook.
+  expected_output: >
+    A structured analysis report for each company with key financial data and investment commentary.
+  agent: deep_dive_researcher
+  context:
+    - identify_market_movers
+  output_file: output/research_report.json
+
+select_top_equity_pick:
+  description: >
+    From the research reports, select one company as the top investment choice.
+    Include a confidence score and a one-line rationale sent as a push notification.
+    Then provide a detailed explanation of why it was selected, and justify why the other companies were not.
+  expected_output: >
+    A detailed selection report highlighting the chosen stock, reasoning, confidence score, and rejection analysis of non-selected companies.
+  agent: equity_selector
+  context:
+    - analyze_company_fundamentals
+  output_file: output/decision.md

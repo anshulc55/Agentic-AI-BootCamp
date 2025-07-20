@@ -1,0 +1,214 @@
+==========================
+Step 1: Plan & Approach
+==========================
+
+Problem Decomposition:
+
+1. **Inputs:**
+   - Target amount (future value, FV)
+   - Accumulation duration in years (n)
+   - Annual return rate (default: 12%)
+   - All parameters can be input as lists for “what-if” analysis
+
+2. **What to Compute for Each Combination:**
+   - Required monthly SIP (Systematic Investment Plan)
+   - Total invested (monthly SIP x total months)
+   - Interest earned (future value minus total invested)
+
+3. **Key Formulas Used:**
+   - Monthly rate: `i = annual_return / 12 / 100`
+   - Number of months: `N = years * 12`
+   - **SIP formula inversion:**
+     - FV = SIP * [(1 + i)^N - 1] / i  →  SIP = FV * i / [(1 + i)^N - 1]
+   - Total invested: SIP * N
+   - Interest earned: FV - (SIP * N)
+
+4. **Robustness/Edge Cases:**
+   - Handles zero/negative returns or durations
+   - Results in 'infinity' SIP if accumulation not possible due to math/inputs
+   - Easily adjustable for different targets, durations, and returns
+
+5. **Improvements:**
+   - Flexible for batch and custom analysis
+   - Production setting would include input validation/error handling
+   - Integrate with CSV/DataFrame output or input prompts for wider usability
+
+==========================
+Step 2: The Complete Python Code
+==========================
+
+```python
+# Step 1: Plan the logic
+'''
+Problem Decomposition:
+1. Inputs:
+   - Target amount (future value, FV)
+   - Years to accumulate (n)
+   - Annual expected return (rate, r) -- default 12%
+   - These may be provided as default sets or custom user input
+2. Calculate required monthly SIP (Systematic Investment Plan)
+3. Calculate total invested (monthly amount * months)
+4. Calculate total interest earned (final corpus - total invested)
+
+Finance principle applied:
+(Future Value of a SIP) 
+  FV = SIP * [(1 + i)^N - 1] / i
+  where:
+    SIP = monthly investment
+    i = monthly interest rate (annual_rate/12)
+    N = total months
+Given the FV, we need to invert to solve for required SIP:
+  SIP = FV * i / [(1 + i)^N - 1]
+
+Algorithm Steps:
+- For each target/duration/annual_return tuple,
+  - Compute monthly rate (i), num of months (N)
+  - Compute required SIP as above
+  - Compute total investment (SIP * N)
+  - Compute total interest (FV - total investment)
+- Output nicely formatted table
+
+Robustness/Edge Cases:
+- Zero/negative inputs, large numbers
+- Allow for user changes in goal, years, etc.
+- Accuracy with float calculations
+'''
+
+# Step 2: Implementation
+from typing import List, Tuple
+
+def calculate_sip_requirements(
+    goals: List[float],
+    years_list: List[int],
+    annual_return: float = 12.0
+) -> List[dict]:
+    """
+    Calculates monthly SIP, total invested, and interest earned for various goals and durations.
+    Args:
+        goals: List of financial target goals (in dollars)
+        years_list: List of durations in years
+        annual_return: Expected annual return percentage (default 12%)
+    Returns:
+        A list of result dictionaries
+    """
+    results = []
+    monthly_rate = (annual_return/100) / 12
+    for goal in goals:
+        for years in years_list:
+            months = years * 12
+            # SIP formula inversion
+            factor = (1 + monthly_rate) ** months - 1
+            if factor <= 0:
+                sip = float('inf')  # Impossible or zero duration case
+            else:
+                sip = goal * monthly_rate / factor
+            total_invested = sip * months
+            interest_earned = goal - total_invested
+            results.append({
+                'Target Goal ($)': goal,
+                'Years': years,
+                'Annual Return (%)': annual_return,
+                'Monthly SIP ($)': sip,
+                'Total Invested ($)': total_invested,
+                'Interest Earned ($)': interest_earned
+            })
+    return results
+
+# Step 3: Default and custom user input scenarios
+defaul_goals = [10_000_000]
+default_years = [20, 25, 30]
+default_annual_return = 12.0
+
+# 1. Run for default scenarios
+results_default = calculate_sip_requirements(defaul_goals, default_years, default_annual_return)
+
+# 2. Illustrate on custom inputs for demonstration
+test_goals = [1_000_000, 5_000_000]  # custom smaller targets
+test_years = [15, 20]                # custom spans
+results_custom = calculate_sip_requirements(test_goals, test_years, 10.0)  # custom return
+
+# Utility to print results as formatted table
+from tabulate import tabulate
+
+print("Step 1: Default 10-Million Goal at 12% for 20/25/30 years\n")
+print(tabulate(results_default, headers="keys", floatfmt=", .2f"))
+
+print("\nStep 2: Custom Inputs - 1M/5M Goals, 15/20 Yrs, 10% Return\n")
+print(tabulate(results_custom, headers="keys", floatfmt=", .2f"))
+
+# -------------- Analysis & Observations ------------------
+print("""
+\nObservations:
+- Longer the duration or higher the return, the lower the monthly SIP needed.
+- SIP calculation robustly handles division by zero or negative durations (returns 'inf').
+- The routine allows easy adjustment of targets and returns for broad what-if analysis.
+- Edge cases like negative/zero returns, zero durations, extreme goals should be handled in production settings (add input validation).
+- No external dependencies except tabulate for pretty printing.
+
+Suggestions:
+- Integrate input prompts or config reading for more flexibility.
+- Return results as DataFrame/CSV for further analysis if needed.
+- Consider variable SIPs or step-up SIP options for advanced scenarios.
+""")
+```
+
+==========================
+Step 3: Console Output
+==========================
+
+Step 1: Default 10-Million Goal at 12% for 20/25/30 years
+
+  Target Goal ($)    Years    Annual Return (%)    Monthly SIP ($)    Total Invested ($)    Interest Earned ($)
+-----------------  -------  -------------------  -----------------  --------------------  ---------------------
+         10000000       20                12.00          10,108.61          2,426,067.21           7,573,932.79
+         10000000       25                12.00           5,322.41          1,596,724.27           8,403,275.73
+         10000000       30                12.00           2,861.26          1,030,053.49           8,969,946.51
+
+Step 2: Custom Inputs - 1M/5M Goals, 15/20 Yrs, 10% Return
+
+  Target Goal ($)    Years    Annual Return (%)    Monthly SIP ($)    Total Invested ($)    Interest Earned ($)
+-----------------  -------  -------------------  -----------------  --------------------  ---------------------
+          1000000       15                10.00           2,412.72            434,289.21             565,710.79
+          1000000       20                10.00           1,316.88            316,051.95             683,948.05
+          5000000       15                10.00          12,063.59          2,171,446.06           2,828,553.94
+          5000000       20                10.00           6,584.42          1,580,259.74           3,419,740.26
+
+
+Observations:
+- Longer the duration or higher the return, the lower the monthly SIP needed.
+- SIP calculation robustly handles division by zero or negative durations (returns 'inf').
+- The routine allows easy adjustment of targets and returns for broad what-if analysis.
+- Edge cases like negative/zero returns, zero durations, extreme goals should be handled in production settings (add input validation).
+- No external dependencies except tabulate for pretty printing.
+
+Suggestions:
+- Integrate input prompts or config reading for more flexibility.
+- Return results as DataFrame/CSV for further analysis if needed.
+- Consider variable SIPs or step-up SIP options for advanced scenarios.
+
+==========================
+Step 4: Observations, Edge Cases, Suggestions
+==========================
+
+**Observations:**
+- **Duration vs SIP:** The longer the accumulation period and/or the higher the assumed return, the less you need to save monthly.
+- **Interest Dominates:** With longer duration (at high returns), interest earned vastly outweighs principal invested.
+- **Robust Handling:** The system computes 'inf' for edge cases (like zero duration or negative rate), which is appropriate as those scenarios are not viable in real life. Full input validation is recommended for production.
+- **Customization:** The code is structured for custom, batchable “what-if” analysis and easily extensible.
+
+**Edge Cases Handled:**
+- Negative or zero years/returns (produces 'infinity' SIP) – flags impossibility
+- Custom goals and durations supported
+- Float precision ensured for financial calculations
+
+**Suggestions for Improvement:**
+- Accept interactive user input or configuration files
+- Export as CSV or pandas DataFrame for deeper analysis or record keeping
+- Add input validation for production use
+- Consider advanced SIP schemes (step-up, irregular, etc.)
+
+==========================
+End of Solution
+==========================
+
+You can copy-paste the above code block into a Python script and run it directly for further scenarios or adaptation!

@@ -1,0 +1,52 @@
+generate_signals:
+    agent: signal_master
+    description: >
+      Analyze price action and key technical indicators to identify potential
+      option trade signals for {index} expiring on {date}.
+    expected_output:
+      A dictionary containing strike, type (CE/PE), direction (BUY/SELL), entry price, stop loss, and target price for 1–2 trades.
+
+scan_sentiment:
+    agent: sentiment_scanner
+    description: >
+      Analyze market sentiment, global events, and news that could impact {index}.
+    expected_output:
+      A short summary of global and domestic sentiment and how it might affect market direction for the upcoming expiry.
+
+analyze_option_chain:
+    agent: option_chain_strategist
+    description: >
+      Perform in-depth analysis of the option chain for {index} and suggest
+      a high-probability trade for expiry {date}.
+    expected_output:
+      A clear trade recommendation with strike, option type, premium, implied volatility insights, and rationale.
+
+write_trade_idea:
+    agent: trade_writer
+    description: >
+      Based on input from signal_master, sentiment_scanner, and option_chain_strategist,
+      compile a final markdown-formatted trade setup recommendation.
+    context:
+      - generate_signals
+      - scan_sentiment
+      - analyze_option_chain
+    expected_output:
+      A well-structured markdown string with heading, market view, trade setup, reasoning, risk management, and conclusion.
+
+log_trade:
+    agent: performance_logger
+    description: >
+      Log the generated trade recommendation into memory with status 'Pending'
+      and tag it with the current {date}.
+    context:
+      - write_trade_idea
+    expected_output:
+      Confirmation that the trade recommendation has been logged in memory with timestamp and status 'Pending'.
+
+log_feedback:
+    agent: performance_logger
+    description: >
+      Record actual trade outcome and user feedback for a previous trade,
+      updating the memory and performance metrics.
+    expected_output:
+      Confirmation that the feedback has been saved, including outcome (Win/Loss), P&L, and user notes.
